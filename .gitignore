@@ -1,0 +1,17 @@
+# OSX
+.DS_Store
+._.*
+
+# Output
+/im2a
+
+# Some images and output for testing
+*.png
+*.jpg
+*.gif
+*.txt
+*.html
+
+# Just in case
+/tmp
+/build
