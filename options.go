@@ -6,44 +6,48 @@ import (
 
 // Options ...
 type Options struct {
-	Args			[]string
-	Help			bool
-	Version			bool
-	Invert			bool
-	Center			bool
-	Grayscale		bool
-	HTML			bool
-	Pixel			bool
-	Width			int
-	Height			int
-	Charset			[]rune
-	RedWeight		float64
-	GreenWeight		float64
-	BlueWeight		float64
+	Args					[]string
+	Help					bool
+	Version					bool
+	Invert					bool
+	Center					bool
+	Grayscale				bool
+	HTML					bool
+	Pixel					bool
+	Transparent				bool
+	TransparencyThreshold	float64
+	Width					int
+	Height					int
+	Charset					[]rune
+	RedWeight				float64
+	GreenWeight				float64
+	BlueWeight				float64
 }
 
 // NewOptions ...
 func NewOptions() *Options {
 	return &Options{
-		Args:			[]string{},
-		Help:			false,
-		Version:		false,
-		Invert:			false,
-		Center:			false,
-		Grayscale:		false,
-		HTML:			false,
-		Pixel:			false,
-		Width:			0,
-		Height:			0,
-		Charset:		[]rune(" M   ...',;:clodxkO0KXNWMM"),
-		RedWeight:		0.2989,
-		GreenWeight:	0.5866,
-		BlueWeight:		0.1145,
+		Args:					[]string{},
+		Help:					false,
+		Version:				false,
+		Invert:					false,
+		Center:					false,
+		Grayscale:				false,
+		HTML:					false,
+		Pixel:					false,
+		Transparent:			false,
+		TransparencyThreshold:	1.0,
+		Width:					0,
+		Height:					0,
+		Charset:				[]rune(" M   ...',;:clodxkO0KXNWMM"),
+		RedWeight:				0.2989,
+		GreenWeight:			0.5866,
+		BlueWeight:				0.1145,
 	}
 }
 
 // Parse ...
-func (o *Options) Parse() error  {
+func (o *Options) Parse() error {
 	charset := string(o.Charset)
 
 	optparse.BoolVar(&o.Help, "help", 'h', o.Help)
@@ -54,6 +58,9 @@ func (o *Options) Parse() error  {
 	optparse.BoolVar(&o.Grayscale, "grayscale", 'g', o.Grayscale)
 	optparse.BoolVar(&o.HTML, "html", 'm', o.HTML)
 	optparse.BoolVar(&o.Pixel, "pixel", 'p', o.Pixel)
+
+	optparse.BoolVar(&o.Transparent, "transparent", 'T', o.Transparent)
+	optparse.FloatVar(&o.TransparencyThreshold, "transparency-threshold", 'X', o.TransparencyThreshold)
 
 	optparse.IntVar(&o.Width, "width", 'W', o.Width)
 	optparse.IntVar(&o.Height, "height", 'H', o.Height)

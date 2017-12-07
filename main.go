@@ -7,7 +7,7 @@ import (
 )
 
 // VERSION ...
-const VERSION = "0.5.1"
+const VERSION = "0.6.0"
 
 // Usage ...
 func usage(f io.Writer, name string) {
@@ -29,20 +29,19 @@ func usage(f io.Writer, name string) {
 	fmt.Fprintln(f)
 
 	fmt.Fprintln(f, "Specific options:")
-	fmt.Fprintln(f, "  -i, --invert              Invert the image")
-	fmt.Fprintln(f, "  -t, --center              Center the image")
-	fmt.Fprintln(f, "  -g, --grayscale           Grayscale output")
-	fmt.Fprintln(f, "  -m, --html                HTML mode")
-	fmt.Fprintln(f, "  -p, --pixel               Pixel mode")
-	fmt.Fprintln(f, "  -W, --width=N             Set output width")
-	fmt.Fprintln(f, "  -H, --height=N            Set output height")
-	fmt.Fprintln(f, "  -c, --charset=C           Set output charset")
-	fmt.Fprintln(f, "  -R, --red-weight=RW       " +
-		"Set red component weight (default: 0.2989)")
-	fmt.Fprintln(f, "  -G, --green-weight=GW     " +
-		"Set green component weight (default: 0.5866)")
-	fmt.Fprintln(f, "  -B, --blue-weight=BW      " +
-		"Set blue component weight (default: 0.1145)")
+	fmt.Fprintln(f, "  -i, --invert                      Invert the image")
+	fmt.Fprintln(f, "  -t, --center                      Center the image")
+	fmt.Fprintln(f, "  -g, --grayscale                   Grayscale output")
+	fmt.Fprintln(f, "  -m, --html                        HTML mode")
+	fmt.Fprintln(f, "  -p, --pixel                       Pixel mode")
+	fmt.Fprintln(f, "  -T, --transparent                 Enable transparency")
+	fmt.Fprintln(f, "  -X, --transparency-threshold=X    Set transparency threshold (default: 1.0)")
+	fmt.Fprintln(f, "  -W, --width=N                     Set output width")
+	fmt.Fprintln(f, "  -H, --height=N                    Set output height")
+	fmt.Fprintln(f, "  -c, --charset=C                   Set output charset")
+	fmt.Fprintln(f, "  -R, --red-weight=RW               Set red component weight (default: 0.2989)")
+	fmt.Fprintln(f, "  -G, --green-weight=GW             Set green component weight (default: 0.5866)")
+	fmt.Fprintln(f, "  -B, --blue-weight=BW              Set blue component weight (default: 0.1145)")
 
 	if f == os.Stderr {
 		os.Exit(1)

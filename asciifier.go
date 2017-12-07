@@ -5,6 +5,7 @@ import (
 
 	"io"
 	"os"
+	"math"
 	"errors"
 	"strings"
 	"net/http"
@@ -16,6 +17,13 @@ import (
 	"golang.org/x/image/draw"
 	"github.com/disintegration/imaging"
 )
+
+// Pixel ...
+type Pixel struct {
+	Color			int
+	Rune			rune
+	Transparent		bool
+}
 
 // Asciifier ...
 type Asciifier struct {
@@ -110,6 +118,11 @@ func (a *Asciifier) Asciify() error {
 		}
 	}
 
+	// In pixel mode we need an even amount of rows.
+	if a.Options.Pixel && height & 1 == 1 {
+		height++
+	}
+
 	// Scale the image.
 	if width > 0 && height > 0 {
 		dst := image.NewRGBA(image.Rect(0, 0, width, height))
@@ -120,25 +133,28 @@ func (a *Asciifier) Asciify() error {
 
 	width, height = src.Bounds().Dx(), src.Bounds().Dy()
 
-	// Allocate runes & pixel buffers.
-	runes := make([]rune, height * width)
-	colors := make([]uint8, height * width)
+	// Allocate pixel buffer.
+	pixels := make([]*Pixel, height * width)
+
+	// Minimum opacity to consider a pixel fully transparent.
+	minOpacity := uint32((1.0 - a.Options.TransparencyThreshold) * 0xFFFF)
 
 	// Walk the image.
 	for y := 0; y < height; y++ {
 		for x := 0; x < width; x++ {
 			// Get pixel.
 			col := src.At(x, y)
+			pixel := &Pixel{}
 
 			// Grayscale it.
-			r, g, b, _ := col.RGBA()
+			r, g, b, aa := col.RGBA()
 			v := uint16((float64(r) * a.Options.RedWeight +
 				float64(g) * a.Options.GreenWeight +
 				float64(b) * a.Options.BlueWeight))
 			grayscale := &color.RGBA64{R: v, G: v, B: v, A: 0}
 
 			// Find nearest grayscale terminal color to assign character.
-			minDistance := float64(0xFFFFFFFF)
+			minDistance := math.Inf(0)
 			idx := 0
 			for i, c := range ColorsG {
 				if distance := colorDistance(c, grayscale); distance < minDistance {
@@ -148,20 +164,23 @@ func (a *Asciifier) Asciify() error {
 			}
 
 			// Assign character.
-			runes[y * width + x] = a.Options.Charset[idx % len(a.Options.Charset)]
+			pixel.Rune = a.Options.Charset[idx % len(a.Options.Charset)]
 
-			if a.Options.Grayscale {
-				// Assign color index as well.
+			if a.Options.Transparent && aa <= minOpacity {
+				// Pixel is transparent.
+				pixel.Transparent = true
+			} else if a.Options.Grayscale {
+				// Assign color index from character index.
 				if idx == 1 {
 					idx = 15
 				} else if idx != 0 {
 					idx += 230
 				}
 
-				colors[y * width + x] = uint8(idx)
+				pixel.Color = idx
 			} else {
-				// Find nearest color from 256-color.
-				minDistance := float64(0xFFFFFFFF)
+				// Find nearest color from the 256-color map.
+				minDistance := math.Inf(0)
 				idx := 0
 
 				for i, c := range ColorsT {
@@ -171,8 +190,11 @@ func (a *Asciifier) Asciify() error {
 					}
 				}
 
-				colors[y * width + x] = uint8(idx)
+				pixel.Color = idx
 			}
+
+			// Store the pixel.
+			pixels[y * width + x] = pixel
 		}
 	}
 
@@ -183,16 +205,22 @@ func (a *Asciifier) Asciify() error {
 	for y := 0; y < height; y++ {
 		a.BeginLine(termWidth, width)
 
+		// We can only optimize colors on the same line.
+		prev1 := &Pixel{Color: -1}
+		prev2 := &Pixel{Color: -1}
+
 		for x := 0; x < width; x++ {
 			if a.Options.Pixel {
 				// Pixel mode - box drawing characters, 2 lines at a time.
-				idx1 := colors[y * width + x]
-				idx2 := colors[y * width + width + x]
-				a.PrintPixel(idx1, idx2)
+				current1 := pixels[y * width + x]
+				current2 := pixels[y * width + width + x]
+				a.PrintPixel(current1, current2, prev1, prev2)
+				prev1 = current1
+				prev2 = current2
 			} else {
-				idx := colors[y * width + x]
-				r := runes[y * width + x]
-				a.PrintRune(idx, r)
+				current1 := pixels[y * width + x]
+				a.PrintRune(current1, prev1)
+				prev1 = current1
 			}
 		}
 
@@ -265,8 +293,10 @@ func (a *Asciifier) EndLine() {
 }
 
 // PrintRune ...
-func (a *Asciifier) PrintRune(idx uint8, r rune) {
+func (a *Asciifier) PrintRune(current *Pixel, prev *Pixel) {
 	if a.Options.HTML {
+		idx := current.Color
+
 		if a.Options.Grayscale {
 			if idx == 1 {
 				idx = 15
@@ -275,13 +305,50 @@ func (a *Asciifier) PrintRune(idx uint8, r rune) {
 			}
 		}
 
-		fmt.Printf("<span class=\"c_%d\">%c</span>", idx, r)
+		if current.Transparent {
+			fmt.Print(" ")
+		} else {
+			fmt.Printf("<span class=\"c_%d\">%c</span>", idx, current.Rune)
+		}
 	} else {
-		fmt.Printf("\x1b[38;5;%dm%c", idx, r)
+		if current.Transparent {
+			if !prev.Transparent {
+				fmt.Print("\x1b[49m")
+			}
+
+			fmt.Print(" ")
+		} else {
+			if current.Color != prev.Color {
+				fmt.Printf("\x1b[38;5;%dm", current.Color)
+			}
+
+			fmt.Printf("%c", current.Rune)
+		}
 	}
 }
 
 // PrintPixel ...
-func (a *Asciifier) PrintPixel(idx1 uint8, idx2 uint8) {
-	fmt.Printf("\x1b[48;5;%dm\x1b[38;5;%dm▄", idx1, idx2)
+func (a *Asciifier) PrintPixel(current1 *Pixel, current2 *Pixel, prev1 *Pixel, prev2 *Pixel) {
+	if current1.Color != prev1.Color || current1.Transparent != prev1.Transparent {
+		if current1.Transparent {
+			fmt.Print("\x1b[49m")
+		} else {
+			fmt.Printf("\x1b[48;5;%dm", current1.Color)
+		}
+	}
+	if current2.Color != prev2.Color || current2.Transparent != prev2.Transparent {
+		if current2.Transparent {
+			fmt.Print("\x1b[39m")
+		} else {
+			fmt.Printf("\x1b[38;5;%dm", current2.Color)
+		}
+	}
+
+	if current1.Color == current2.Color || (current1.Transparent && current2.Transparent) {
+		fmt.Print(" ")
+	} else if current1.Transparent {
+		fmt.Print("▀")
+	} else {
+		fmt.Print("▄")
+	}
 }

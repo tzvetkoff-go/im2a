@@ -13,6 +13,7 @@ Here are some examples:
 - It's written entirely in Go and does not depend on ImageMagick
 - It only supports PNG, JPG & GIF images
 - It's ~5x slower
+- It handles transparency differently (e.g. rgba(255, 255, 255, 0.5) is represented like rgba(127, 127, 127, 0.5))
 
 ## Installation
 
@@ -23,7 +24,7 @@ go get -u github.com/go2c/im2a
 ## Usage
 
 ```
-im2a 0.5.1
+im2a 0.6.0
 
 Convert image files to ASCII art
 Copyright (C) 2013-2017 Latchezar Tzvetkoff
@@ -33,21 +34,23 @@ Usage:
   im2a [options] [arguments]
 
 Common options:
-  -h, --help                Print help and exit
-  -v, --version             Print version and exit
+  -h, --help                        Print help and exit
+  -v, --version                     Print version and exit
 
 Specific options:
-  -i, --invert              Invert the image
-  -t, --center              Center the image
-  -g, --grayscale           Grayscale output
-  -m, --html                HTML mode
-  -p, --pixel               Pixel mode
-  -W, --width=N             Set output width
-  -H, --height=N            Set output height
-  -c, --charset=C           Set output charset
-  -R, --red-weight=RW       Set red component weight (default: 0.2989)
-  -G, --green-weight=GW     Set green component weight (default: 0.5866)
-  -B, --blue-weight=BW      Set blue component weight (default: 0.1145)
+  -i, --invert                      Invert the image
+  -t, --center                      Center the image
+  -g, --grayscale                   Grayscale output
+  -m, --html                        HTML mode
+  -p, --pixel                       Pixel mode
+  -T, --transparent                 Enable transparency
+  -X, --transparency-threshold=X    Set transparency threshold (default: 1.0)
+  -W, --width=N                     Set output width
+  -H, --height=N                    Set output height
+  -c, --charset=C                   Set output charset
+  -R, --red-weight=RW               Set red component weight (default: 0.2989)
+  -G, --green-weight=GW             Set green component weight (default: 0.5866)
+  -B, --blue-weight=BW              Set blue component weight (default: 0.1145)
 ```
 
 ## License

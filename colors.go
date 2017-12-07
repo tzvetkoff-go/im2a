@@ -86,6 +86,7 @@ var ColorsGG = []uint32{
 // ColorsG ...
 var ColorsG = []*color.RGBA{}
 
+// Static initializer ...
 func init() {
 	for _, c := range ColorsTT {
 		r, g, b := (c >> 16) & 0xff, (c >> 8) & 0xff, c & 0xff
