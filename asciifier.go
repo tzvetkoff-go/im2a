@@ -3,37 +3,38 @@ package main
 import (
 	"fmt"
 
-	"io"
-	"os"
-	"math"
 	"errors"
-	"strings"
-	"net/http"
 	"image"
 	"image/color"
 	_ "image/gif"
-	_ "image/png"
 	_ "image/jpeg"
-	"golang.org/x/image/draw"
+	_ "image/png"
+	"io"
+	"math"
+	"net/http"
+	"os"
+	"strings"
+
 	"github.com/disintegration/imaging"
+	"golang.org/x/image/draw"
 )
 
 // Pixel ...
 type Pixel struct {
-	Color			int
-	Rune			rune
-	Transparent		bool
+	Color       int
+	Rune        rune
+	Transparent bool
 }
 
 // Asciifier ...
 type Asciifier struct {
-	Options			*Options
+	Options *Options
 }
 
 // NewAsciifier ...
 func NewAsciifier(options *Options) *Asciifier {
 	return &Asciifier{
-		Options:		options,
+		Options: options,
 	}
 }
 
@@ -86,32 +87,32 @@ func (a *Asciifier) Asciify() error {
 		// Use provided values
 		width, height = a.Options.Width, a.Options.Height
 	} else if a.Options.Width > 0 {
-		// Calculate height from width.
+		// TODO: Calculate height from width.
 	} else if a.Options.Height > 0 {
-		// Calculate width from height.
+		// TODO: Calculate width from height.
 	} else if !a.Options.HTML {
 		// Infer size from terminal.
 		if a.Options.Pixel {
 			// Scale to Width:Height*2.
-			prop := float64(src.Bounds().Dy()) / float64(terminal.Height * 2 - 2)
+			prop := float64(src.Bounds().Dy()) / float64(terminal.Height*2-2)
 			width = roundInt(float64(src.Bounds().Dx()) / prop)
-			height = terminal.Height * 2 - 2
+			height = terminal.Height*2 - 2
 
 			// Fit width.
 			if width > terminal.Width {
-				prop = float64(src.Bounds().Dx()) / float64(terminal.Width - 1)
+				prop = float64(src.Bounds().Dx()) / float64(terminal.Width-1)
 				width = terminal.Width - 1
 				height = roundInt(float64(src.Bounds().Dy()) / prop)
 			}
 		} else {
 			// Scale to Width/2:Height.
-			prop := float64(src.Bounds().Dy()) / float64(terminal.Height - 1) / 2.0
+			prop := float64(src.Bounds().Dy()) / float64(terminal.Height-1) / 2.0
 			width = roundInt(float64(src.Bounds().Dx()) / prop)
 			height = terminal.Height - 1
 
 			// Fit width.
 			if width > terminal.Width {
-				prop = float64(src.Bounds().Dx()) / float64(terminal.Width - 1) * 2.0
+				prop = float64(src.Bounds().Dx()) / float64(terminal.Width-1) * 2.0
 				width = terminal.Width - 1
 				height = roundInt(float64(src.Bounds().Dy()) / prop)
 			}
@@ -119,7 +120,7 @@ func (a *Asciifier) Asciify() error {
 	}
 
 	// In pixel mode we need an even amount of rows.
-	if a.Options.Pixel && height & 1 == 1 {
+	if a.Options.Pixel && height&1 == 1 {
 		height++
 	}
 
@@ -134,7 +135,7 @@ func (a *Asciifier) Asciify() error {
 	width, height = src.Bounds().Dx(), src.Bounds().Dy()
 
 	// Allocate pixel buffer.
-	pixels := make([]*Pixel, height * width)
+	pixels := make([]*Pixel, height*width)
 
 	// Minimum opacity to consider a pixel fully transparent.
 	minOpacity := uint32((1.0 - a.Options.TransparencyThreshold) * 0xFFFF)
@@ -148,9 +149,9 @@ func (a *Asciifier) Asciify() error {
 
 			// Grayscale it.
 			r, g, b, aa := col.RGBA()
-			v := uint16((float64(r) * a.Options.RedWeight +
-				float64(g) * a.Options.GreenWeight +
-				float64(b) * a.Options.BlueWeight))
+			v := uint16((float64(r)*a.Options.RedWeight +
+				float64(g)*a.Options.GreenWeight +
+				float64(b)*a.Options.BlueWeight))
 			grayscale := &color.RGBA64{R: v, G: v, B: v, A: 0}
 
 			// Find nearest grayscale terminal color to assign character.
@@ -164,7 +165,7 @@ func (a *Asciifier) Asciify() error {
 			}
 
 			// Assign character.
-			pixel.Rune = a.Options.Charset[idx % len(a.Options.Charset)]
+			pixel.Rune = a.Options.Charset[idx%len(a.Options.Charset)]
 
 			if a.Options.Transparent && aa <= minOpacity {
 				// Pixel is transparent.
@@ -194,7 +195,7 @@ func (a *Asciifier) Asciify() error {
 			}
 
 			// Store the pixel.
-			pixels[y * width + x] = pixel
+			pixels[y*width+x] = pixel
 		}
 	}
 
@@ -212,13 +213,13 @@ func (a *Asciifier) Asciify() error {
 		for x := 0; x < width; x++ {
 			if a.Options.Pixel {
 				// Pixel mode - box drawing characters, 2 lines at a time.
-				current1 := pixels[y * width + x]
-				current2 := pixels[y * width + width + x]
+				current1 := pixels[y*width+x]
+				current2 := pixels[y*width+width+x]
 				a.PrintPixel(current1, current2, prev1, prev2)
 				prev1 = current1
 				prev2 = current2
 			} else {
-				current1 := pixels[y * width + x]
+				current1 := pixels[y*width+x]
 				a.PrintRune(current1, prev1)
 				prev1 = current1
 			}
@@ -273,13 +274,14 @@ func (a *Asciifier) PrintFooter() {
 		fmt.Println("</pre>")
 		fmt.Println("</body>")
 		fmt.Println("</html>")
+		fmt.Printf("<!-- im2a v%s -->\n", VERSION)
 	}
 }
 
 // BeginLine ...
 func (a *Asciifier) BeginLine(termWidth int, imageWidth int) {
 	if a.Options.Center && !a.Options.HTML {
-		fmt.Print(strings.Repeat(" ", (termWidth - imageWidth) / 2))
+		fmt.Print(strings.Repeat(" ", (termWidth-imageWidth)/2))
 	}
 }
 

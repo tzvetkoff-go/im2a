@@ -89,12 +89,12 @@ var ColorsG = []*color.RGBA{}
 // Static initializer ...
 func init() {
 	for _, c := range ColorsTT {
-		r, g, b := (c >> 16) & 0xff, (c >> 8) & 0xff, c & 0xff
+		r, g, b := (c>>16)&0xFF, (c>>8)&0xFF, c&0xFF
 		ColorsT = append(ColorsT, &color.RGBA{R: uint8(r), G: uint8(g), B: uint8(b)})
 	}
 
 	for _, c := range ColorsGG {
-		r, g, b := (c >> 16) & 0xff, (c >> 8) & 0xff, c & 0xff
+		r, g, b := (c>>16)&0xFF, (c>>8)&0xFF, c&0xFF
 		ColorsG = append(ColorsG, &color.RGBA{R: uint8(r), G: uint8(g), B: uint8(b)})
 	}
 }

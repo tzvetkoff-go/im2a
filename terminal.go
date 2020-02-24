@@ -2,15 +2,15 @@ package main
 
 import (
 	"os"
+	"strconv"
 	"syscall"
 	"unsafe"
-	"strconv"
 )
 
 // Terminal ...
 type Terminal struct {
-	Width			int
-	Height			int
+	Width  int
+	Height int
 }
 
 // NewTerminal ...
@@ -24,7 +24,7 @@ func NewTerminal() *Terminal {
 		width, _ = strconv.Atoi(s1)
 		height, _ = strconv.Atoi(s2)
 	} else {
-		win := &struct { h, w, x, y uint16 }{}
+		win := &struct{ h, w, x, y uint16 }{}
 		code, _, _ := syscall.Syscall(syscall.SYS_IOCTL,
 			uintptr(syscall.Stdin), uintptr(syscall.TIOCGWINSZ),
 			uintptr(unsafe.Pointer(win)))
@@ -35,7 +35,7 @@ func NewTerminal() *Terminal {
 	}
 
 	return &Terminal{
-		Width:			width,
-		Height:			height,
+		Width:  width,
+		Height: height,
 	}
 }

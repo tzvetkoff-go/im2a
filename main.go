@@ -1,13 +1,13 @@
 package main
 
 import (
-	"os"
-	"io"
 	"fmt"
+	"io"
+	"os"
 )
 
 // VERSION ...
-const VERSION = "0.6.0"
+const VERSION = "0.6.1"
 
 // Usage ...
 func usage(f io.Writer, name string) {
@@ -15,7 +15,7 @@ func usage(f io.Writer, name string) {
 	fmt.Fprintln(f)
 
 	fmt.Fprintln(f, "Convert image files to ASCII art")
-	fmt.Fprintln(f, "Copyright (C) 2013-2017 Latchezar Tzvetkoff")
+	fmt.Fprintln(f, "Copyright (C) 2013 Latchezar Tzvetkoff")
 	fmt.Fprintln(f, "Distributed under The Beerware License")
 	fmt.Fprintln(f)
 
@@ -44,10 +44,10 @@ func usage(f io.Writer, name string) {
 	fmt.Fprintln(f, "  -B, --blue-weight=BW              Set blue component weight (default: 0.1145)")
 
 	if f == os.Stderr {
-		os.Exit(1)
-	} else {
-		os.Exit(0)
+		os.Exit(1) // revive:disable-line:deep-exit
 	}
+
+	os.Exit(0) // revive:disable-line:deep-exit
 }
 
 // Main ...
