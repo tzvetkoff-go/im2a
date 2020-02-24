@@ -7,7 +7,7 @@ warningCode = 0
 
 # Suggests using constant for magic numbers and string literals.
 [rule.add-constant]
-arguments = [{ maxLitCount = "3", allowStrs = "\"\",\"text/plain\",\" \"", allowInts = "0,1,2,3,4,5,6,7,8,9,15,16,230,0xFF,0xFFFF", allowFloats = "1.0,2.0,0.2989,0.5866,0.1145" }]
+arguments = [{ maxLitCount = "3", allowStrs = "\"\",\"text/plain\",\" \"", allowInts = "0,1,2,3,4,5,6,7,8,9,10,15,16,230,0xFF,0xFFFF", allowFloats = "1.0,2.0,0.2989,0.5866,0.1145" }]
 
 # Warns when a function receives more parameters than the maximum.
 [rule.argument-limit]
