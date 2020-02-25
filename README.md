@@ -24,7 +24,7 @@ go get -u github.com/go2c/im2a
 ## Usage
 
 ```
-im2a 0.6.0
+im2a 0.6.1
 
 Convert image files to ASCII art
 Copyright (C) 2013-2017 Latchezar Tzvetkoff
