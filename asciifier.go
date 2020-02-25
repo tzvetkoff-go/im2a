@@ -264,7 +264,7 @@ func (a *Asciifier) PrintHeader() {
 		fmt.Println("    body { background: #000000; }")
 		fmt.Println("    pre { font: normal 12px/9px Menlo, monospace; }")
 		if a.Options.Center {
-			fmt.Println("    pre { text-aling: center; }")
+			fmt.Println("    pre { text-align: center; }")
 		}
 		if a.Options.Grayscale {
 			for idx, color := range ColorsGG {
