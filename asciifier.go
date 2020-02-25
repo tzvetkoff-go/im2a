@@ -288,7 +288,7 @@ func (a *Asciifier) PrintFooter() {
 		fmt.Println("</pre>")
 		fmt.Println("</body>")
 		fmt.Println("</html>")
-		fmt.Printf("<!-- im2a v%s -->\n", VERSION)
+		fmt.Printf("<!-- im2a-go v%s -->\n", VERSION)
 	}
 }
 
