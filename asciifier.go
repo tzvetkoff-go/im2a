@@ -87,9 +87,23 @@ func (a *Asciifier) Asciify() error {
 		// Use provided values
 		width, height = a.Options.Width, a.Options.Height
 	} else if a.Options.Width > 0 {
-		// TODO: Calculate height from width.
+		// Calculate height from width.
+		prop := float64(src.Bounds().Dx()) / float64(a.Options.Width)
+		width = a.Options.Width
+		height = roundInt(float64(src.Bounds().Dy()) / prop)
+
+		if !a.Options.HTML && !a.Options.Pixel {
+			height /= 2
+		}
 	} else if a.Options.Height > 0 {
-		// TODO: Calculate width from height.
+		// Calculate width from height.
+		prop := float64(src.Bounds().Dy()) / float64(a.Options.Height)
+		width = roundInt(float64(src.Bounds().Dx()) / prop)
+		height = a.Options.Height
+
+		if !a.Options.HTML && !a.Options.Pixel {
+			width *= 2
+		}
 	} else if !a.Options.HTML {
 		// Infer size from terminal.
 		if a.Options.Pixel {

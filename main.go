@@ -67,6 +67,13 @@ func main() {
 	}
 
 	// Sanitize command-line options.
+	if options.HTML && options.Pixel {
+		fmt.Fprintf(os.Stderr,
+			"%s: cannot use --html and --pixel at the same time\n\n",
+			os.Args[0])
+		usage(os.Stderr, os.Args[0])
+	}
+
 	if len(options.Args) != 1 {
 		fmt.Fprintf(os.Stderr,
 			"%s: wrong number of arguments (given %d, expected %d)\n\n",
