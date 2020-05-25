@@ -1,0 +1,13 @@
+{
+	"[go]":{
+		"editor.insertSpaces": false,
+		"editor.formatOnSave": true
+	},
+	"go.formatTool": "goimports",
+	"go.lintOnSave": "package",
+	"go.lintTool": "revive",
+	"go.lintFlags": [
+		"-config=${workspaceFolder}/revive.toml",
+		"-formatter=unix"
+	]
+}
