@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/go2c/optparse"
+	"github.com/tzvetkoff-go/optparse"
 )
 
 // Options ...

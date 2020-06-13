@@ -1,9 +1,9 @@
-module github.com/go2c/im2a
+module github.com/tzvetkoff-go/im2a
 
-go 1.13
+go 1.14
 
 require (
 	github.com/disintegration/imaging v1.6.2
-	github.com/go2c/optparse v0.1.0
-	golang.org/x/image v0.0.0-20200119044424-58c23975cae1
+	github.com/tzvetkoff-go/optparse v0.0.0-20200613135135-7718cf5540c1
+	golang.org/x/image v0.0.0-20200609002522-3f4726a040e8
 )

@@ -18,13 +18,13 @@ Here are some examples:
 ## Installation
 
 ``` bash
-go get -u github.com/go2c/im2a
+go get -u github.com/tzvetkoff-go/im2a
 ```
 
 ## Usage
 
 ```
-im2a 0.6.1
+im2a 0.6.2
 
 Convert image files to ASCII art
 Copyright (C) 2013-2017 Latchezar Tzvetkoff

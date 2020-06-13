@@ -7,7 +7,7 @@ import (
 )
 
 // VERSION ...
-const VERSION = "0.6.1"
+const VERSION = "0.6.2"
 
 // Usage ...
 func usage(f io.Writer, name string) {
