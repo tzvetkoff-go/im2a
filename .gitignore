@@ -3,7 +3,7 @@
 ._.*
 
 # Output
-/im2a
+/cmd/im2a/im2a
 
 # Some images and output for testing
 *.png
@@ -14,4 +14,3 @@
 
 # Just in case
 /tmp
-

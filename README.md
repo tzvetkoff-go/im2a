@@ -18,7 +18,7 @@ Here are some examples:
 ## Installation
 
 ``` bash
-go get -u github.com/tzvetkoff-go/im2a
+go get -u github.com/tzvetkoff-go/im2a/cmd/im2a
 ```
 
 ## Usage

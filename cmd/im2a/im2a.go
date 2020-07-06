@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"io"
 	"os"
-)
 
-// VERSION ...
-const VERSION = "0.6.2"
+	"github.com/tzvetkoff-go/im2a/im2a"
+)
 
 // Usage ...
 func usage(f io.Writer, name string) {
-	fmt.Fprintf(f, "im2a %s\n", VERSION)
+	fmt.Fprintf(f, "im2a %s\n", im2a.Version)
 	fmt.Fprintln(f)
 
 	fmt.Fprintln(f, "Convert image files to ASCII art")
@@ -44,16 +43,16 @@ func usage(f io.Writer, name string) {
 	fmt.Fprintln(f, "  -B, --blue-weight=BW              Set blue component weight (default: 0.1145)")
 
 	if f == os.Stderr {
-		os.Exit(1) // revive:disable-line:deep-exit
+		os.Exit(1)
 	}
 
-	os.Exit(0) // revive:disable-line:deep-exit
+	os.Exit(0)
 }
 
 // Main ...
 func main() {
-	options := NewOptions()
-	if err := options.Parse(); err != nil {
+	options := im2a.NewOptions()
+	if err := options.ParseCommandLine(os.Args[1:]); err != nil {
 		fmt.Fprintf(os.Stderr, "%s: %s\n\n", os.Args[0], err.Error())
 		usage(os.Stderr, os.Args[0])
 	}
@@ -62,7 +61,7 @@ func main() {
 		usage(os.Stdout, os.Args[0])
 	}
 	if options.Version {
-		fmt.Println(VERSION)
+		fmt.Println(im2a.Version)
 		os.Exit(0)
 	}
 
@@ -74,16 +73,9 @@ func main() {
 		usage(os.Stderr, os.Args[0])
 	}
 
-	if len(options.Args) != 1 {
-		fmt.Fprintf(os.Stderr,
-			"%s: wrong number of arguments (given %d, expected %d)\n\n",
-			os.Args[0], len(options.Args), 1)
-		usage(os.Stderr, os.Args[0])
-	}
-
 	// Create asfiifier.
-	asciifier := NewAsciifier(options)
-	if err := asciifier.Asciify(); err != nil {
+	asciifier := im2a.NewAsciifier(options)
+	if err := asciifier.Asciify(os.Stdout); err != nil {
 		fmt.Fprintf(os.Stderr, "%s: %s\n\n", os.Args[0], err.Error())
 		os.Exit(0)
 	}

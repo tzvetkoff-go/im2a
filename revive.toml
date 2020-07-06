@@ -11,13 +11,13 @@ arguments = [{ maxLitCount = "3", allowStrs = "\"\",\"text/plain\",\" \"", allow
 
 # Warns when a function receives more parameters than the maximum.
 [rule.argument-limit]
-arguments = [4]
+arguments = [5]
 
 # Check for commonly mistaken usages of the sync/atomic package.
 [rule.atomic]
 
 # Blank import should be only in a main or test package, or have a comment justifying it.
-[rule.blank-imports]
+#[rule.blank-imports]
 
 # Using Boolean literals (true, false) in logic expressions may make the code less readable.
 [rule.bool-literal-in-expr]
@@ -45,7 +45,7 @@ arguments = [4]
 #arguments = [10]
 
 # Packages exposing functions that can stop program execution by exiting are hard to reuse.
-[rule.deep-exit]
+#[rule.deep-exit]
 
 # Importing with . makes the programs much harder to understand because it is unclear whether names belong to the current package or to an imported package.
 [rule.dot-imports]

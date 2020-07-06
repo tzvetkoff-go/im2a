@@ -1,4 +1,4 @@
-package main
+package im2a
 
 import (
 	"fmt"
@@ -39,18 +39,18 @@ func NewAsciifier(options *Options) *Asciifier {
 }
 
 // Asciify ...
-func (a *Asciifier) Asciify() error {
+func (a *Asciifier) Asciify(out io.Writer) error {
 	var file io.ReadCloser
-	if strings.HasPrefix(a.Options.Args[0], "http://") || strings.HasPrefix(a.Options.Args[0], "https://") {
+	if strings.HasPrefix(a.Options.Image, "http://") || strings.HasPrefix(a.Options.Image, "https://") {
 		// Open URL.
-		response, err := http.Get(a.Options.Args[0])
+		response, err := http.Get(a.Options.Image)
 		if err != nil {
 			return err
 		}
 		file = response.Body
 	} else {
 		// Open local file.
-		f, err := os.Open(a.Options.Args[0])
+		f, err := os.Open(a.Options.Image)
 		if err != nil {
 			return err
 		}
@@ -214,11 +214,11 @@ func (a *Asciifier) Asciify() error {
 	}
 
 	// Header.
-	a.PrintHeader()
+	a.PrintHeader(out)
 
 	// Print the buffer.
 	for y := 0; y < height; y++ {
-		a.BeginLine(termWidth, width)
+		a.BeginLine(out, termWidth, width)
 
 		// We can only optimize colors on the same line.
 		prev1 := &Pixel{Color: -1}
@@ -229,17 +229,17 @@ func (a *Asciifier) Asciify() error {
 				// Pixel mode - box drawing characters, 2 lines at a time.
 				current1 := pixels[y*width+x]
 				current2 := pixels[y*width+width+x]
-				a.PrintPixel(current1, current2, prev1, prev2)
+				a.PrintPixel(out, current1, current2, prev1, prev2)
 				prev1 = current1
 				prev2 = current2
 			} else {
 				current1 := pixels[y*width+x]
-				a.PrintRune(current1, prev1)
+				a.PrintRune(out, current1, prev1)
 				prev1 = current1
 			}
 		}
 
-		a.EndLine()
+		a.EndLine(out)
 
 		if a.Options.Pixel {
 			y++
@@ -247,69 +247,69 @@ func (a *Asciifier) Asciify() error {
 	}
 
 	// Footer.
-	a.PrintFooter()
+	a.PrintFooter(out)
 
 	return nil
 }
 
 // PrintHeader ...
-func (a *Asciifier) PrintHeader() {
+func (a *Asciifier) PrintHeader(out io.Writer) {
 	if a.Options.HTML {
-		fmt.Println("<!DOCTYPE html>")
-		fmt.Println("<html>")
-		fmt.Println("<head>")
-		fmt.Println("  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />")
-		fmt.Println("  <title>im2a asciified image</title>")
-		fmt.Println("  <style type=\"text/css\">")
-		fmt.Println("    body { background: #000000; }")
-		fmt.Println("    pre { font: normal 12px/9px Menlo, monospace; }")
+		fmt.Fprintln(out, "<!DOCTYPE html>")
+		fmt.Fprintln(out, "<html>")
+		fmt.Fprintln(out, "<head>")
+		fmt.Fprintln(out, "  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />")
+		fmt.Fprintln(out, "  <title>im2a asciified image</title>")
+		fmt.Fprintln(out, "  <style type=\"text/css\">")
+		fmt.Fprintln(out, "    body { background: #000000; }")
+		fmt.Fprintln(out, "    pre { font: normal 12px/9px Menlo, monospace; }")
 		if a.Options.Center {
-			fmt.Println("    pre { text-align: center; }")
+			fmt.Fprintln(out, "    pre { text-align: center; }")
 		}
 		if a.Options.Grayscale {
 			for idx, color := range ColorsGG {
-				fmt.Printf("    .c_%d { color: #%06x }\n", idx, color)
+				fmt.Fprintf(out, "    .c_%d { color: #%06x }\n", idx, color)
 			}
 		} else {
 			for idx, color := range ColorsTT {
-				fmt.Printf("    .c_%d { color: #%06x }\n", idx, color)
+				fmt.Fprintf(out, "    .c_%d { color: #%06x }\n", idx, color)
 			}
 		}
-		fmt.Println("  </style>")
-		fmt.Println("</head>")
-		fmt.Println("<body>")
-		fmt.Println("<pre>")
+		fmt.Fprintln(out, "  </style>")
+		fmt.Fprintln(out, "</head>")
+		fmt.Fprintln(out, "<body>")
+		fmt.Fprintln(out, "<pre>")
 	}
 }
 
 // PrintFooter ...
-func (a *Asciifier) PrintFooter() {
+func (a *Asciifier) PrintFooter(out io.Writer) {
 	if a.Options.HTML {
-		fmt.Println("</pre>")
-		fmt.Println("</body>")
-		fmt.Println("</html>")
-		fmt.Printf("<!-- im2a-go v%s -->\n", VERSION)
+		fmt.Fprintln(out, "</pre>")
+		fmt.Fprintln(out, "</body>")
+		fmt.Fprintln(out, "</html>")
+		fmt.Fprintf(out, "<!-- im2a-go v%s -->\n", Version)
 	}
 }
 
 // BeginLine ...
-func (a *Asciifier) BeginLine(termWidth int, imageWidth int) {
+func (a *Asciifier) BeginLine(out io.Writer, termWidth int, imageWidth int) {
 	if a.Options.Center && !a.Options.HTML {
-		fmt.Print(strings.Repeat(" ", (termWidth-imageWidth)/2))
+		fmt.Fprint(out, strings.Repeat(" ", (termWidth-imageWidth)/2))
 	}
 }
 
 // EndLine ...
-func (a *Asciifier) EndLine() {
+func (a *Asciifier) EndLine(out io.Writer) {
 	if a.Options.HTML {
-		fmt.Println("")
+		fmt.Fprintln(out, "")
 	} else {
-		fmt.Println("\x1b[0;0m")
+		fmt.Fprintln(out, "\x1b[0;0m")
 	}
 }
 
 // PrintRune ...
-func (a *Asciifier) PrintRune(current *Pixel, prev *Pixel) {
+func (a *Asciifier) PrintRune(out io.Writer, current *Pixel, prev *Pixel) {
 	if a.Options.HTML {
 		idx := current.Color
 
@@ -322,49 +322,49 @@ func (a *Asciifier) PrintRune(current *Pixel, prev *Pixel) {
 		}
 
 		if current.Transparent {
-			fmt.Print(" ")
+			fmt.Fprint(out, " ")
 		} else {
-			fmt.Printf("<span class=\"c_%d\">%c</span>", idx, current.Rune)
+			fmt.Fprintf(out, "<span class=\"c_%d\">%c</span>", idx, current.Rune)
 		}
 	} else {
 		if current.Transparent {
 			if !prev.Transparent {
-				fmt.Print("\x1b[49m")
+				fmt.Fprint(out, "\x1b[49m")
 			}
 
-			fmt.Print(" ")
+			fmt.Fprint(out, " ")
 		} else {
 			if current.Color != prev.Color {
-				fmt.Printf("\x1b[38;5;%dm", current.Color)
+				fmt.Fprintf(out, "\x1b[38;5;%dm", current.Color)
 			}
 
-			fmt.Printf("%c", current.Rune)
+			fmt.Fprintf(out, "%c", current.Rune)
 		}
 	}
 }
 
 // PrintPixel ...
-func (a *Asciifier) PrintPixel(current1 *Pixel, current2 *Pixel, prev1 *Pixel, prev2 *Pixel) {
+func (a *Asciifier) PrintPixel(out io.Writer, current1 *Pixel, current2 *Pixel, prev1 *Pixel, prev2 *Pixel) {
 	if current1.Color != prev1.Color || current1.Transparent != prev1.Transparent {
 		if current1.Transparent {
-			fmt.Print("\x1b[49m")
+			fmt.Fprint(out, "\x1b[49m")
 		} else {
-			fmt.Printf("\x1b[48;5;%dm", current1.Color)
+			fmt.Fprintf(out, "\x1b[48;5;%dm", current1.Color)
 		}
 	}
 	if current2.Color != prev2.Color || current2.Transparent != prev2.Transparent {
 		if current2.Transparent {
-			fmt.Print("\x1b[39m")
+			fmt.Fprint(out, "\x1b[39m")
 		} else {
-			fmt.Printf("\x1b[38;5;%dm", current2.Color)
+			fmt.Fprintf(out, "\x1b[38;5;%dm", current2.Color)
 		}
 	}
 
 	if current1.Color == current2.Color || (current1.Transparent && current2.Transparent) {
-		fmt.Print(" ")
+		fmt.Fprint(out, " ")
 	} else if current1.Transparent {
-		fmt.Print("▀")
+		fmt.Fprint(out, "▀")
 	} else {
-		fmt.Print("▄")
+		fmt.Fprint(out, "▄")
 	}
 }
