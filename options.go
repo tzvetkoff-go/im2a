@@ -84,7 +84,6 @@ func (o *Options) ParseCommandLine(args []string) error {
 	}
 
 	o.Charset = []rune(charset)
-	fmt.Println(args)
 	o.Image = args[0]
 
 	return nil

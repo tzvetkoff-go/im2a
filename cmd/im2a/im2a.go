@@ -5,7 +5,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/tzvetkoff-go/im2a/im2a"
+	"github.com/tzvetkoff-go/im2a"
 )
 
 // Usage ...

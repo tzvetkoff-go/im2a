@@ -12,7 +12,7 @@ Here are some examples:
 
 - It's written entirely in Go and does not depend on ImageMagick
 - It only supports PNG, JPG & GIF images
-- It's ~5x slower
+- It's somewhat slower
 - It handles transparency differently (e.g. rgba(255, 255, 255, 0.5) is represented like rgba(127, 127, 127, 0.5))
 
 ## Installation
