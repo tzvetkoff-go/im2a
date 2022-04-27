@@ -72,7 +72,7 @@ var ColorsTT = []uint32{
 }
 
 // ColorsT ...
-var ColorsT = []*color.RGBA{}
+var ColorsT = make([]*color.RGBA, len(ColorsTT))
 
 // ColorsGG ...
 var ColorsGG = []uint32{
@@ -84,17 +84,17 @@ var ColorsGG = []uint32{
 }
 
 // ColorsG ...
-var ColorsG = []*color.RGBA{}
+var ColorsG = make([]*color.RGBA, len(ColorsGG))
 
 // Static initializer ...
 func init() {
-	for _, c := range ColorsTT {
+	for i, c := range ColorsTT {
 		r, g, b := (c>>16)&0xFF, (c>>8)&0xFF, c&0xFF
-		ColorsT = append(ColorsT, &color.RGBA{R: uint8(r), G: uint8(g), B: uint8(b)})
+		ColorsT[i] = &color.RGBA{R: uint8(r), G: uint8(g), B: uint8(b)}
 	}
 
-	for _, c := range ColorsGG {
+	for i, c := range ColorsGG {
 		r, g, b := (c>>16)&0xFF, (c>>8)&0xFF, c&0xFF
-		ColorsG = append(ColorsG, &color.RGBA{R: uint8(r), G: uint8(g), B: uint8(b)})
+		ColorsG[i] = &color.RGBA{R: uint8(r), G: uint8(g), B: uint8(b)}
 	}
 }

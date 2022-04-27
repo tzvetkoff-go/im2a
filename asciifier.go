@@ -1,19 +1,19 @@
 package im2a
 
 import (
-	"fmt"
-
 	"errors"
+	"fmt"
 	"image"
 	"image/color"
-	_ "image/gif"
-	_ "image/jpeg"
-	_ "image/png"
 	"io"
 	"math"
 	"net/http"
 	"os"
 	"strings"
+
+	_ "image/gif"
+	_ "image/jpeg"
+	_ "image/png"
 
 	"github.com/disintegration/imaging"
 	"golang.org/x/image/draw"

@@ -1,4 +1,4 @@
 package im2a
 
 // Version ...
-const Version = "0.6.2"
+var Version = "0.6.2"

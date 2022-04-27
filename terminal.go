@@ -25,9 +25,11 @@ func NewTerminal() *Terminal {
 		height, _ = strconv.Atoi(s2)
 	} else {
 		win := &struct{ h, w, x, y uint16 }{}
-		code, _, _ := syscall.Syscall(syscall.SYS_IOCTL,
+		code, _, _ := syscall.Syscall(
+			syscall.SYS_IOCTL,
 			uintptr(syscall.Stdin), uintptr(syscall.TIOCGWINSZ),
-			uintptr(unsafe.Pointer(win)))
+			uintptr(unsafe.Pointer(win)),
+		)
 		if code == 0 {
 			width = int(win.w)
 			height = int(win.h)
